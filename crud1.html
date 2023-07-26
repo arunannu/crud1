@@ -1,0 +1,24 @@
+
+<html>
+    <head>
+        <title>jsProject</title>
+    </head>
+    <body bgcolor="grey">
+        <center><h2>Booking Appointment</h2></center>
+        <fieldset>
+            <form onsubmit="savetoLocalstorage(event)">
+                Name:<br>
+                <input type="text" name="name"><br><br>
+                Email:<br>
+                <input type="text" name="email"><br><br>
+                Address:<br>
+                <input type="text" name="address"><br><br>
+                <button>submit</button>
+            </form>
+        </fieldset>
+        <ul id="listOfItem"></ul>
+        <script src="crud1.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    </body>
+</html>
+
