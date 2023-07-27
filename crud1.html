@@ -1,24 +1,105 @@
-
 <html>
-    <head>
-        <title>jsProject</title>
-    </head>
-    <body bgcolor="grey">
-        <center><h2>Booking Appointment</h2></center>
-        <fieldset>
-            <form onsubmit="savetoLocalstorage(event)">
-                Name:<br>
-                <input type="text" name="name"><br><br>
-                Email:<br>
-                <input type="text" name="email"><br><br>
-                Address:<br>
-                <input type="text" name="address"><br><br>
-                <button>submit</button>
-            </form>
-        </fieldset>
-        <ul id="listOfItem"></ul>
-        <script src="crud1.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
-    </body>
-</html>
+<head>
+    <title>User Details</title>
+</head>
+<body bg="grey">
+    <legend><h2>User Details</h2></legend>
+    <fieldset>
+    <form id="userForm">
+        <label for="name">  Name:</label>
+        <input type="text" id="nameInputTag" name="name" required><br>
+        <label for="email"> Email:</label>
+        <input type="email" id="emailInputTag" name="email" required><br>
+        <label for="address">Address:</label>
+        <input type="text" id="addressInputTag" name="address" required><br>
+        <button type="submit">Submit</button>
+    </form>
+    </fieldset>
+    <fieldset>
+    <ul id="listOfItem"></ul>
+    </fieldset>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <script>
+        function savetoLocalstorage(event) {
+            event.preventDefault();
+            let name = event.target.name.value;
+            let email = event.target.email.value;
+            let address = event.target.address.value;
+
+            let obj1 = {
+                name,
+                email,
+                address
+            };
+
+            axios.post("https://crudcrud.com/api/8d6b35a8d5a14a2590b4b3fb06539086/BookingAppointment", obj1)
+                .then((res) => {
+                    // obj1._id = res.data._id; // Assign the ID received from the server to the object
+                    showUserDetailsOnScreen(res.data);
+                })
+                .catch((err) => console.error(err));
+
+            // Reset the form after submitting
+            event.target.reset();
+        }
+
+        function deleteUserDetails(userId, listItem) {
+            axios.delete(`https://crudcrud.com/api/8d6b35a8d5a14a2590b4b3fb06539086/BookingAppointment/${userId}`)
+                .then(() => {
+                    const parentEl = document.getElementById("listOfItem");
+                    parentEl.removeChild(listItem);
+                })
+                .catch((err) => console.error(err));
+        }
+
+        function editUserDetails(userObj, listItem) {
+            const nameInput = document.getElementById('nameInputTag');
+            const emailInput = document.getElementById('emailInputTag');
+            const addressInput = document.getElementById('addressInputTag');
+
+            nameInput.value = userObj.name;
+            emailInput.value = userObj.email;
+            addressInput.value = userObj.address;
+
+            // Remove the current list item from the UI
+            const parentEl = document.getElementById("listOfItem");
+            parentEl.removeChild(listItem);
+        }
+
+        function showUserDetailsOnScreen(userObj) {
+            const parentEl = document.getElementById("listOfItem");
+            const listItem = document.createElement("li");
+            listItem.textContent = userObj.name + "-" + userObj.email + "-" + userObj.address;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Delete";
+            deleteButton.onclick = () => deleteUserDetails(userObj._id, listItem);
+
+            const editButton = document.createElement('button');
+            editButton.textContent = "Edit";
+            editButton.onclick = () => editUserDetails(userObj, listItem);
+
+            listItem.appendChild(deleteButton);
+            listItem.appendChild(editButton);
+
+            parentEl.appendChild(listItem);
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const userForm = document.getElementById('userForm');
+            userForm.addEventListener('submit', savetoLocalstorage);
+
+            // Load existing user details on page load
+            axios.get("https://crudcrud.com/api/8d6b35a8d5a14a2590b4b3fb06539086/BookingAppointment")
+                .then((res) => {
+                    console.log(res.data);
+                    for (let i = 0; i < res.data.length; i++) {
+                        showUserDetailsOnScreen(res.data[i]);
+                    }
+                })
+                .catch((err) => console.error(err));
+        });
+    </script>
+</body>
+</html>
